@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/bienvenue_sur_all4sport"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -25,15 +26,16 @@
         android:layout_marginStart="100dp"
         android:layout_marginTop="360dp"
         android:layout_marginEnd="101dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/email"
+        android:textColorHint="#FFFFFF"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
         app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:autofillHints="" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextTextPassword"
@@ -43,8 +45,10 @@
         android:layout_marginTop="405dp"
         android:layout_marginEnd="101dp"
         android:layout_marginBottom="17dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/mot_de_passe"
+        android:textColorHint="#FFFFFF"
         android:inputType="textPassword"
         android:minHeight="48dp"
         app:layout_constraintBottom_toTopOf="@+id/button"
@@ -52,8 +56,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        android:autofillHints="" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/button"
