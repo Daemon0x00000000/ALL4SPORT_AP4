@@ -2,6 +2,7 @@ package com.example.all4sport;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -27,10 +28,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 if(identifiant.getText().toString().equals("test") && password.getText().toString().equals("test")) {
                     Toast.makeText(MainActivity.this,"Connexion Établie",Toast.LENGTH_SHORT).show();
+                    ouvreAPP();
                 }else
                     Toast.makeText(MainActivity.this,"identifiant ou mot de passe incorrect",Toast.LENGTH_SHORT).show();
+
             }
         });
+
+    }
+
+    public void ouvreAPP() {
+        Intent intent = new Intent(this, app.class);
+        startActivity(intent);
     }
 
 }
