@@ -4,26 +4,31 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btn1;
-    private TextView titre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.btn1 = (Button) findViewById(R.id.btn1);
-        this.titre = (TextView) findViewById(R.id.titre);
+        TextView identifiant =(TextView) findViewById(R.id.identifiant);
+        TextView password =(TextView) findViewById(R.id.password);
 
-        btn1.setOnClickListener(new View.OnClickListener() {
+        MaterialButton connexion = (MaterialButton) findViewById(R.id.connexion);
+
+        connexion.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                titre.setText("Vous avez cliqué sur le Bouton !!!");
+            public void onClick(View v){
+                if(identifiant.getText().toString().equals("test") && password.getText().toString().equals("test")) {
+                    Toast.makeText(MainActivity.this,"Connexion Établie",Toast.LENGTH_SHORT).show();
+                }else
+                    Toast.makeText(MainActivity.this,"identifiant ou mot de passe incorrect",Toast.LENGTH_SHORT).show();
             }
         });
     }
