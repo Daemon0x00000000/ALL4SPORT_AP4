@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 // Import ML Kit barcode scanning
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.odml.image.MlImage;
@@ -32,23 +34,42 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
+import androidx.camera.core.VideoCapture;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.camera.core.CameraSelector.Builder;
 
+import org.w3c.dom.Text;
 
+import java.util.Objects;
 
 
 public class app extends AppCompatActivity {
+    private String referenceProduit;
+    private LinearLayout layout;
+    private TextView referenceView;
+    private FloatingActionButton floatingQrCodeButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private void setActivityView() {
         setContentView(R.layout.activity_app);
+        layout = findViewById(R.id.content);
+        if (referenceProduit != null) {
+            referenceView = new TextView(this);
+            referenceView.setText(referenceProduit);
+            layout.addView(referenceView);
+        } else {
+            referenceView = new TextView(this);
+            referenceView.setText("Aucun produit scanné");
+            layout.addView(referenceView);
+        }
+        qrCodeListener();
+    }
 
-        FloatingActionButton floatingQrCodeButton = findViewById(R.id.qrCode);
+    private void qrCodeListener() {
+        floatingQrCodeButton = findViewById(R.id.qrCode);
         floatingQrCodeButton.setOnClickListener(view -> {
             // Pour la permission de la camera
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -72,11 +93,22 @@ public class app extends AppCompatActivity {
     }
 
 
-    @SuppressLint("RestrictedApi")
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setActivityView();
+
+
+    }
+
+
+    @SuppressLint({"RestrictedApi", "UnsafeOptInUsageError"})
     private void launchCamera(ProcessCameraProvider cameraProvider) {
-        CameraX.unbindAll();
+
         PreviewView previewView = new PreviewView(this);
         setContentView(previewView);
+
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
@@ -85,34 +117,27 @@ public class app extends AppCompatActivity {
 
         ImageCapture imageCapture = new ImageCapture.Builder().build();
 
-
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                 .setTargetResolution(new Size(640, 640))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
-
-        // TODO : Afficher un carré sur l'écran pour scanner le QR Code
-
         SquareView squareView = new SquareView(this);
         squareView.setBackgroundColor(Color.TRANSPARENT);
-        // Center the square with gravity
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            squareView.setForegroundGravity(View.TEXT_ALIGNMENT_CENTER);
-        }
         addContentView(squareView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), this::qrCode);
 
-
-        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageCapture, imageAnalysis);
-
+        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
 
 
     }
 
 
-    private void qrCode(ImageProxy image) {
+    @SuppressLint("RestrictedApi")
+    private void qrCode(ImageProxy imageProxy) {
+        // Analyse de l'image, ne pas oublier de fermer l'image
+        @SuppressLint("UnsafeOptInUsageError") InputImage image = InputImage.fromMediaImage(Objects.requireNonNull(imageProxy.getImage()), imageProxy.getImageInfo().getRotationDegrees());
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
@@ -120,20 +145,27 @@ public class app extends AppCompatActivity {
                         .build();
         BarcodeScanner scanner = BarcodeScanning.getClient(options);
 
-        @SuppressLint("UnsafeOptInUsageError") Image mediaImage = image.getImage();
-        if (mediaImage != null) {
-            InputImage image1 = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
-            scanner.process(image1)
-                    .addOnSuccessListener(barcodes -> {
-                        for (Barcode barcode : barcodes) {
-                            String rawValue = barcode.getRawValue();
-                            System.out.println(rawValue);
+        scanner.process(image)
+                .addOnSuccessListener(barcodes -> {
+                    // Check for a string
+                    for (Barcode barcode : barcodes) {
+                        String rawValue = barcode.getRawValue();
+                        if (rawValue != null) {
+                            referenceProduit = rawValue;
+                            // Stop the camera
+                            CameraX.unbindAll();
+                            // Go back to the main activity
+                            // Call onCreate safely
+                            setActivityView();
                         }
-                    })
-                    .addOnFailureListener(e -> {
-                        e.printStackTrace();
-                    });
-        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Error");
+                })
+                .addOnCompleteListener(task -> {
+                    imageProxy.close();
+                });
     }
 }
 
@@ -151,6 +183,11 @@ class SquareView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawRect(0, 0, 640, 640, paint);
+        canvas.drawRect(
+                (float) (getWidth() / 2) - 320,
+                (float) (getHeight() / 2) - 320,
+                (float) (getWidth() / 2) + 320,
+                (float) (getHeight() / 2) + 320,
+                paint);
     }
 }
