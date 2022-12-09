@@ -7,12 +7,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Rational;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 //Import CameraX
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
@@ -115,10 +119,10 @@ public class app extends AppCompatActivity {
         Preview preview = new Preview.Builder().build();
         preview.setSurfaceProvider(previewView.getPreviewSurfaceProvider());
 
-        ImageCapture imageCapture = new ImageCapture.Builder().build();
 
+
+        ImageCapture imageCapture = new ImageCapture.Builder().build();
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setTargetResolution(new Size(640, 640))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
@@ -138,24 +142,22 @@ public class app extends AppCompatActivity {
     private void qrCode(ImageProxy imageProxy) {
         // Analyse de l'image, ne pas oublier de fermer l'image
         @SuppressLint("UnsafeOptInUsageError") InputImage image = InputImage.fromMediaImage(Objects.requireNonNull(imageProxy.getImage()), imageProxy.getImageInfo().getRotationDegrees());
+        // CROP input image to square
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
-                                Barcode.FORMAT_QR_CODE)
+                                Barcode.FORMAT_ALL_FORMATS)
                         .build();
         BarcodeScanner scanner = BarcodeScanning.getClient(options);
 
         scanner.process(image)
                 .addOnSuccessListener(barcodes -> {
-                    // Check for a string
+
                     for (Barcode barcode : barcodes) {
                         String rawValue = barcode.getRawValue();
                         if (rawValue != null) {
                             referenceProduit = rawValue;
-                            // Stop the camera
                             CameraX.unbindAll();
-                            // Go back to the main activity
-                            // Call onCreate safely
                             setActivityView();
                         }
                     }
@@ -191,3 +193,4 @@ class SquareView extends View {
                 paint);
     }
 }
+
