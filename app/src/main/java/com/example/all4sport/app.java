@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -76,23 +77,8 @@ public class app extends AppCompatActivity {
         floatingQrCodeButton = findViewById(R.id.qrCode);
         floatingQrCodeButton.setOnClickListener(view -> {
             // Pour la permission de la camera
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
-                ActivityCompat.requestPermissions((Activity) this,
-                        new String[] { Manifest.permission.CAMERA },
-                        100);
-            } else {
-                ListenableFuture<ProcessCameraProvider> cameraProvider = ProcessCameraProvider.getInstance(this);
-                cameraProvider.addListener(() -> {
-                    try {
-                        ProcessCameraProvider provider = cameraProvider.get();
-                        launchCamera(provider);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, ContextCompat.getMainExecutor(this));
-            }
+            Intent intent = new Intent(this, Scan.class);
+            startActivity(intent);
         });
     }
 
@@ -104,70 +90,6 @@ public class app extends AppCompatActivity {
         setActivityView();
 
 
-    }
-
-
-    @SuppressLint({"RestrictedApi", "UnsafeOptInUsageError"})
-    private void launchCamera(ProcessCameraProvider cameraProvider) {
-
-        PreviewView previewView = new PreviewView(this);
-        setContentView(previewView);
-
-        CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build();
-        Preview preview = new Preview.Builder().build();
-        preview.setSurfaceProvider(previewView.getPreviewSurfaceProvider());
-
-
-
-        ImageCapture imageCapture = new ImageCapture.Builder().build();
-        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build();
-
-        SquareView squareView = new SquareView(this);
-        squareView.setBackgroundColor(Color.TRANSPARENT);
-        addContentView(squareView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), this::qrCode);
-
-        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
-
-
-    }
-
-
-    @SuppressLint("RestrictedApi")
-    private void qrCode(ImageProxy imageProxy) {
-        // Analyse de l'image, ne pas oublier de fermer l'image
-        @SuppressLint("UnsafeOptInUsageError") InputImage image = InputImage.fromMediaImage(Objects.requireNonNull(imageProxy.getImage()), imageProxy.getImageInfo().getRotationDegrees());
-        // CROP input image to square
-        BarcodeScannerOptions options =
-                new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(
-                                Barcode.FORMAT_ALL_FORMATS)
-                        .build();
-        BarcodeScanner scanner = BarcodeScanning.getClient(options);
-
-        scanner.process(image)
-                .addOnSuccessListener(barcodes -> {
-
-                    for (Barcode barcode : barcodes) {
-                        String rawValue = barcode.getRawValue();
-                        if (rawValue != null) {
-                            referenceProduit = rawValue;
-                            CameraX.unbindAll();
-                            setActivityView();
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    System.out.println("Error");
-                })
-                .addOnCompleteListener(task -> {
-                    imageProxy.close();
-                });
     }
 }
 

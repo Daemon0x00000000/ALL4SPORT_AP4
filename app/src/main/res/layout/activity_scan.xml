@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Scan">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/blue_teal"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:id="@+id/container">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="52dp"
+            app:cardBackgroundColor="@color/white"
+            android:foreground="@drawable/scan"
+            android:id="@+id/cardView">
+            <androidx.camera.view.PreviewView
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:id="@+id/previewView">
+            </androidx.camera.view.PreviewView>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:alpha="1"
+            android:text="VEUILLEZ SCANNEZ LE PRODUIT"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:id="@+id/scanTitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:alpha="0.6"
+            android:text="Vous devez scanner un qr code ou un code barre"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:id="@+id/scanSubTitle" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
