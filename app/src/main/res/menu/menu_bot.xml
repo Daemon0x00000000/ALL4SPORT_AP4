@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <item
+        android:id="@+id/article"
+        android:icon="@drawable/ic_baseline_article_24"
+        android:title="Article"/>
+
+    <item
+        android:id="@+id/vide"
+        android:title=""/>
+
+    <item
+        android:id="@+id/panier"
+        android:icon="@drawable/ic_baseline_shopping_cart_24"
+        android:title="Panier"/>
+
+</menu>
