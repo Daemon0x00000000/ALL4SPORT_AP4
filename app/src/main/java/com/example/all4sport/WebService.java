@@ -9,7 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class WebService {
-    private static final String URL_API = "http://127.0.0.1/projet-all4sport/ALL4SPORT/api/";
+    private static final String URL_API = "http://127.0.0.1:8000/api/";
     private static OkHttpClient client = new OkHttpClient();
 
     public boolean getLogin(String login, String password) throws IOException {

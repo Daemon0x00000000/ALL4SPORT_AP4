@@ -1,5 +1,6 @@
 package com.example.all4sport;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -78,7 +79,16 @@ public class app extends AppCompatActivity {
         floatingQrCodeButton.setOnClickListener(view -> {
             // Pour la permission de la camera
             Intent intent = new Intent(this, Scan.class);
-            startActivity(intent);
+            // Expect result from Scan activity
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    referenceProduit = Objects.requireNonNull(data).getStringExtra("reference");
+                    setActivityView();
+                }
+            }).launch(intent);
+
+
         });
     }
 
@@ -90,29 +100,6 @@ public class app extends AppCompatActivity {
         setActivityView();
 
 
-    }
-}
-
-class SquareView extends View {
-    private Paint paint = new Paint();
-
-    public SquareView(Context context) {
-        super(context);
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(5);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        canvas.drawRect(
-                (float) (getWidth() / 2) - 320,
-                (float) (getHeight() / 2) - 320,
-                (float) (getWidth() / 2) + 320,
-                (float) (getHeight() / 2) + 320,
-                paint);
     }
 }
 
