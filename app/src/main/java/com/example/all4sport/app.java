@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 // Import ML Kit barcode scanning
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.odml.image.MlImage;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -93,11 +94,13 @@ public class app extends AppCompatActivity {
     }
 
 
-
+    private BottomNavigationView bottomNavatigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setActivityView();
+        bottomNavatigationView=findViewById(R.id.bottomNavatigationView);
+        bottomNavatigationView.setBackground(null);
 
 
     }
