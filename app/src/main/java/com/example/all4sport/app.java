@@ -50,6 +50,7 @@ import androidx.camera.core.CameraSelector.Builder;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.Objects;
 
 
@@ -78,18 +79,31 @@ public class app extends AppCompatActivity {
         floatingQrCodeButton = findViewById(R.id.qrCode);
         floatingQrCodeButton.setOnClickListener(view -> {
             // Pour la permission de la camera
-            Intent intent = new Intent(this, Scan.class);
-            // Expect result from Scan activity
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    referenceProduit = Objects.requireNonNull(data).getStringExtra("reference");
-                    setActivityView();
-                }
-            }).launch(intent);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED)
+            {
+                ActivityCompat.requestPermissions((Activity) this,
+                        new String[] { Manifest.permission.CAMERA },
+                        100);
+            } else {
+                Intent intent = new Intent(this, Scan.class);
+                startActivityForResult(intent, 1);
+
+            }
 
 
         });
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                // Faire quelque chose avec le résultat
+                System.out.println("resultat:" + result);
+            }
+        }
     }
 
 

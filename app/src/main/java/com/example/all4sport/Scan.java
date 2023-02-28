@@ -188,6 +188,10 @@ public class Scan extends AppCompatActivity {
                         if (rawValue != null) {
                             CameraX.unbindAll();
                         }
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("result", rawValue);
+                        setResult(Activity.RESULT_OK, resultIntent);
+                        finish();
                     }
                 })
                 .addOnFailureListener(e -> {
