@@ -102,7 +102,7 @@ public class app extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
                 // Faire quelque chose avec le résultat
-                System.out.println("resultat:" + result);
+                referenceProduit = result;
             }
         }
     }
