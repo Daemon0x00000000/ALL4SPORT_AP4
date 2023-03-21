@@ -61,18 +61,14 @@ public class app extends AppCompatActivity {
     private TextView referenceView;
     private FloatingActionButton floatingQrCodeButton;
 
+
+
     private void setActivityView() {
         setContentView(R.layout.activity_app);
-        layout = findViewById(R.id.content);
-        if (referenceProduit != null) {
-            referenceView = new TextView(this);
-            referenceView.setText(referenceProduit);
-            layout.addView(referenceView);
-        } else {
-            referenceView = new TextView(this);
-            referenceView.setText("Aucun produit scanné");
-            layout.addView(referenceView);
-        }
+        this.layout = findViewById(R.id.content);
+        this.referenceView = new TextView(this);
+        this.referenceView.setText("Aucun produit scanné");
+        this.layout.addView(this.referenceView);
         qrCodeListener();
     }
 
@@ -103,6 +99,7 @@ public class app extends AppCompatActivity {
                 String result = data.getStringExtra("result");
                 // Faire quelque chose avec le résultat
                 referenceProduit = result;
+                this.referenceView.setText(referenceProduit);
             }
         }
     }

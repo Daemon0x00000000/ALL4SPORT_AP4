@@ -8,12 +8,16 @@
         android:id="@+id/article"
         android:icon="@drawable/ic_baseline_article_24"
         android:title="Article"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/panier"
         android:icon="@drawable/ic_baseline_shopping_cart_24"
         android:title="Panier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:showAsAction="ifRoom"/>
 
 </menu>
