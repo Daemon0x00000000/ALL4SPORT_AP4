@@ -10,13 +10,131 @@
     <LinearLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/qrCode"
         app:layout_constraintEnd_toEndOf="parent"
+        android:padding="10dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/imageArticle"
+                android:layout_width="164dp"
+                android:layout_height="164dp"
+                android:src="@drawable/login_bg"
+                android:scaleType="centerCrop"
 
-        <!-- The main content goes here -->
+                android:contentDescription="@string/articleimage" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="164dp"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/nameArticle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/name"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_margin="4dp"/>
+
+                    <TextView
+                        android:id="@+id/priceArticle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/prix"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_margin="4dp" />
+
+                    <TextView
+                        android:id="@+id/ttc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ttc"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_margin="4dp" />
+
+
+                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addToCart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/green"
+                    android:drawableLeft="@drawable/ic_baseline_add_shopping_cart_24"
+                    android:text="@string/addCart"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_alignParentBottom="true"
+                    />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/descriptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:backgroundTint="@color/black"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_margin="4dp"
+                />
+
+            <TextView
+                android:id="@+id/descriptionArticleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:gravity="center"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/scan"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            />
+
 
     </LinearLayout>
 
@@ -25,7 +143,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="TODO"
-        android:src="@drawable/common_google_signin_btn_icon_dark"
+        android:src="@drawable/ic_baseline_qr_code_scanner_24"
         app:layout_anchor="@id/bottomAppBar"
         app:useCompatPadding="true" />
 
