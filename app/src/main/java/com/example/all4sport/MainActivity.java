@@ -2,8 +2,9 @@ package com.example.all4sport;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -14,26 +15,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-
-
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String url = "http://172.20.10.8:8000/api/login";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,23 +49,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkLogin(String username, String password) throws JSONException {
-        RequestQueue queue = Volley.newRequestQueue(this);
         JSONObject jsonCredentials = new JSONObject("{username: \"" + username + "\", password: \"" + password + "\"}");
-        System.out.println(jsonCredentials.get("username"));
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonCredentials, new Response.Listener<JSONObject>() {
+        String endpoint = "/login";
+        BearerTokenRequest request = new BearerTokenRequest(this);
+        request.sendRequest(Request.Method.POST, endpoint, jsonCredentials, new BearerTokenRequest.BearerTokenRequestCallback() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onSuccess(JSONObject response) {
+                SharedPreferences sharedPreferences = getSharedPreferences("MonApplication", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                try {
+                    editor.putString("bearer_token", response.getString("token"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                editor.apply();
                 Toast.makeText(MainActivity.this,"Connexion Établie",Toast.LENGTH_SHORT).show();
                 ouvreAPP();
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onError(VolleyError error) {
                 System.out.println(error.toString());
                 Toast.makeText(MainActivity.this,"identifiant ou mot de passe incorrect",Toast.LENGTH_SHORT).show();
             }
         });
-        queue.add(jsonObjectRequest);
     }
 
     public void ouvreAPP() {
