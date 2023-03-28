@@ -27,4 +27,17 @@
     <string name="qrCode">Scan QR Code</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="addCart">Ajouter au panier</string>
+    <string name="ttc">TTC</string>
+    <string name="prix">Prix :</string>
+    <string name="name">"Nom : "</string>
+    <string name="description">"Description : "</string>
+    <string name="articleimage">ArticleImage</string>
+    <string name="scan">Veuillez scanner un produit</string>
+    <string name="panier">Votre panier</string>
+    <string name="valider">Valider</string>
+    <string name="ville">Ville...</string>
+    <string name="codePostal">Code postal...</string>
+    <string name="adresse">Adresse...</string>
+    <string name="order">Commander</string>
 </resources>
