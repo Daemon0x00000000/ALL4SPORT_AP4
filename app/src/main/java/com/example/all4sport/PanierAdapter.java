@@ -78,7 +78,12 @@ public class PanierAdapter extends RecyclerView.Adapter<PanierAdapter.ViewHolder
             itemQuantity = itemView.findViewById(R.id.text_view_item_quantity);
             itemButton = itemView.findViewById(R.id.button_remove_item);
 
+            // Margin for item
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) itemView.getLayoutParams();
+            layoutParams.setMargins(20, 20, 20, 20);
 
+            // Elevate item
+            itemView.setElevation(10);
         }
     }
 
