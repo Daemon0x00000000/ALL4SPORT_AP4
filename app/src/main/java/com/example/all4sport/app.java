@@ -14,50 +14,39 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 
 public class app extends AppCompatActivity {
-    private String referenceProduit;
-    private LinearLayout layout;
     private FloatingActionButton floatingQrCodeButton;
-    private LinearLayout loadingLayout;
-    private TextView priceArticle;
-    private TextView nomArticle;
-    private ImageView imageArticle;
-    private TextView descriptionArticle;
-    private MaterialButton buttonAddToCart;
     private BottomNavigationView bottomNavatigationView;
-    private final boolean[] isProduitInCart = {false};
+    private FrameLayout frameLayout;
+    private MyViewModel mViewModel;
 
 
     private void setActivityView() {
         setContentView(R.layout.activity_app);
-        this.layout = findViewById(R.id.content);
-        this.loadingLayout = findViewById(R.id.loadingLayout);
-        this.nomArticle = findViewById(R.id.nameArticle);
-        this.priceArticle = findViewById(R.id.priceArticle);
-        this.imageArticle = findViewById(R.id.imageArticle);
-        this.descriptionArticle = findViewById(R.id.descriptionArticleText);
-        this.buttonAddToCart = findViewById(R.id.addToCart);
-        this.loadingLayout.setVisibility(View.VISIBLE);
         qrCodeListener();
-        addButtonListener();
     }
 
     private void qrCodeListener() {
@@ -86,8 +75,7 @@ public class app extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
                 // Faire quelque chose avec le résultat
-                referenceProduit = result;
-                String endpoint = "/articles?reference=" + referenceProduit;
+                String endpoint = "/articles?reference=" + result;
                 BearerTokenRequest bearerTokenRequest = new BearerTokenRequest(this);
                 bearerTokenRequest.sendRequest(Request.Method.GET, endpoint, null, new BearerTokenRequest.BearerTokenRequestCallback() {
                     @Override
@@ -112,20 +100,10 @@ public class app extends AppCompatActivity {
             String description = articleInfos.getString("description");
             String image = articleInfos.getString("photos");
 
-            String tvaPrice = String.valueOf(Double.parseDouble(price) + 0.2 * Double.parseDouble(price));
-            String nameArticleText = "Nom : " + name;
-            String priceArticleText = "Prix : " + tvaPrice + " €";
+            Double tvaPrice = Double.parseDouble(price) + 0.2 * Double.parseDouble(price);
 
-            this.nomArticle.setText(nameArticleText);
-            this.priceArticle.setText(priceArticleText);
-            byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            this.imageArticle.setImageBitmap(decodedByte);
-
-            this.descriptionArticle.setText(description);
-            checkCart();
-            this.loadingLayout.setVisibility(View.GONE);
-            this.layout.setVisibility(View.VISIBLE);
+            CartItem cartItem = new CartItem(reference, image, name, 1, tvaPrice);
+            mViewModel.setCartItem(cartItem);
 
         } catch (Exception e) {
             System.out.println(e);
@@ -137,113 +115,37 @@ public class app extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setActivityView();
+        frameLayout = findViewById(R.id.fragment_container);
+        mViewModel = new ViewModelProvider(this).get(MyViewModel.class);
         bottomNavatigationView=findViewById(R.id.bottomNavatigationView);
         bottomNavatigationView.setBackground(null);
-        bottomNavatigationView.setSelectedItemId(R.id.article);
-
-        bottomNavatigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        Fragment fragment = new ProductFragment(this);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        bottomNavatigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.panier) {
-                    Intent panierIntent = new Intent(app.this, Panier.class);
-                    panierIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    panierIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(panierIntent);
-                    System.out.println("panier");
-                    return true;
+                Fragment selectedFragment = null;
+                switch (item.getItemId()) {
+                    case R.id.article:
+                        selectedFragment = new ProductFragment(app.this);
+                        break;
+                    case R.id.panier:
+                        selectedFragment = new PanierFragment(app.this);
+                        break;
+                    case R.id.promos:
+                        selectedFragment = new PromoFragment(app.this);
+                        break;
                 }
-                return false;
-            }
-        });
-
-
-    }
-
-    private boolean checkCart() {
-        String endpoint = "/panier";
-        BearerTokenRequest request = new BearerTokenRequest(this);
-        request.sendRequest(Request.Method.GET, endpoint, null, new BearerTokenRequest.BearerTokenRequestCallback() {
-                    @Override
-                    public void onSuccess(JSONObject response) {
-                        try {
-                            JSONArray panier = response.getJSONArray("articles");
-                            for (int i = 0; i < panier.length(); i++) {
-                                JSONObject article = panier.getJSONObject(i);
-                                if (article.getString("reference").equals(referenceProduit)) {
-                                    isProduitInCart[0] = true;
-                                    buttonAddToCart.setText("Supprimer du panier");
-                                }
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e);
-                        }
-                    }
-
-                    @Override
-                    public void onError(VolleyError error) {
-                        System.out.println(error);
-                    }
-                });
-        return isProduitInCart[0];
-    }
-
-    private void addToCart() {
-        String endpoint = "/panier";
-        BearerTokenRequest request = new BearerTokenRequest(this);
-        JSONObject body = new JSONObject();
-        try {
-            body.put("reference", referenceProduit);
-            body.put("quantite", 1);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        buttonAddToCart.setEnabled(false);
-        request.sendRequest(Request.Method.POST, endpoint, body, new BearerTokenRequest.BearerTokenRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                System.out.println(response);
-                buttonAddToCart.setEnabled(true);
-                buttonAddToCart.setText("Supprimer du panier");
-            }
-
-            @Override
-            public void onError(VolleyError error) {
-                System.out.println(error);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                return true;
             }
         });
     }
 
-    private void deleteFromCart() {
-        String endpoint = "/panier/" + referenceProduit;
-        BearerTokenRequest request = new BearerTokenRequest(this);
-        buttonAddToCart.setEnabled(false);
-        request.sendRequest(Request.Method.DELETE, endpoint, null, new BearerTokenRequest.BearerTokenRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                System.out.println(response);
-                buttonAddToCart.setEnabled(true);
-                buttonAddToCart.setText("Ajouter au panier");
-            }
 
-            @Override
-            public void onError(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-    }
 
-    private void addButtonListener() {
-        buttonAddToCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isProduitInCart[0]) {
-                    deleteFromCart();
-                } else {
-                    addToCart();
-                }
-            }
-        });
-    }
+
+
 
 }
 

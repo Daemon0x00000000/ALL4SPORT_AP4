@@ -6,6 +6,16 @@ public class CartItem {
     private String nom;
     private int quantity;
     private double price;
+    private double discount;
+
+    public CartItem(String reference, String image, String nom, int quantity, double price, double discount) {
+        this.reference = reference;
+        this.image = image;
+        this.nom = nom;
+        this.quantity = quantity;
+        this.price = price;
+        this.discount = discount;
+    }
 
     public CartItem(String reference, String image, String nom, int quantity, double price) {
         this.reference = reference;
@@ -13,6 +23,7 @@ public class CartItem {
         this.nom = nom;
         this.quantity = quantity;
         this.price = price;
+        this.discount = 0;
     }
 
     public String getReference() { return reference; }
@@ -40,12 +51,21 @@ public class CartItem {
         this.price = price;
     }
 
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
     public String toString() {
         return "CartItem{" +
                 "image='" + image + '\'' +
                 ", nom='" + nom + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
+                ", discount=" + discount +
                 '}';
     }
 
